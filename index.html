@@ -242,6 +242,11 @@
   .fb-reply b { display: block; font: 800 13px var(--round); color: var(--brown); margin-bottom: 2px; }
   .fb-wait { font-size: 13px; color: var(--muted); background: #f6f1e3; border-radius: 12px; padding: 6px 10px; display: inline-block; }
   .new-badge { font: 700 11px/1 var(--round); background: var(--nose); color: #fff; padding: 3px 7px; border-radius: 99px; margin-left: 4px; vertical-align: 1px; }
+  .cal-card { background: var(--white); border-radius: 22px; padding: 14px 16px; margin-bottom: 12px; }
+  .cal-h { font: 800 16px/1.3 var(--round); color: var(--brown); margin-bottom: 2px; }
+  .cal-steps { margin: 8px 0 12px; padding-left: 20px; font-size: 14px; line-height: 1.7; }
+  .cal-btn { display: block; width: 100%; text-align: center; text-decoration: none; }
+  .cal-other summary { color: var(--muted); font-size: 13px; text-align: center; padding: 6px 0 10px; cursor: pointer; }
   .next-bar { display: flex; align-items: center; gap: 8px; background: var(--white); border-radius: 99px; padding: 9px 14px; margin: -4px 0 14px;
     font-size: 13.5px; color: var(--text); box-shadow: 0 3px 0 var(--line); cursor: pointer; }
   .next-bar.quiet { color: var(--muted); cursor: default; justify-content: center; }
@@ -850,7 +855,7 @@ function tabPlan(id, trip, items) {
     </div>`;
   }).join('') || `<div class="empty">${CLOUD('', 'width:120px;display:block;margin:0 auto 10px')}还没有内容，点下面的 ＋ 添加</div>`;
   return `<div class="chips" style="margin-bottom:14px">
-      <button class="chip" onclick="addAllCal()">📅 全部加到手机日历</button>
+      <button class="chip" onclick="addAllCal()">📅 同步到手机日历</button>
       ${days.has(today) ? `<button class="chip" onclick="document.getElementById('today').scrollIntoView({behavior:'smooth'})">跳到今天</button>` : ''}
     </div>${list}`;
 }
@@ -941,7 +946,7 @@ function tabUs(id, trip) {
     <div class="menu">
       <button onclick="share()"><span class="ic t-ticket">🔗</span><span>邀请同行的人<small>复制这次旅行的专属链接，拿到的人能看能改</small></span></button>
       <button onclick="recommend()"><span class="ic t-expense">🎁</span><span>推荐给别人用<small>只发网址，不带你的任何行程</small></span></button>
-      <button onclick="addAllCal()"><span class="ic t-flight">📅</span><span>全部加到手机日历<small>提前 1 天和 3 小时提醒</small></span></button>
+      <button onclick="addAllCal()"><span class="ic t-flight">📅</span><span>同步到手机日历<small>iPhone 可订阅自动更新，提前 1 天和 3 小时提醒</small></span></button>
       <button onclick="openTripEditor('${id}')"><span class="ic t-hotel">⚙️</span><span>旅行设置<small>名称、日期、成员</small></span></button>
       <a href="#/feedback"><span class="ic t-train">💬</span><span>意见反馈${FB.unread() ? ` <b class="new-badge">${FB.unread()} 条新回复</b>` : ''}<small>提建议、报问题，作者会在这里回复你</small></span></a>
       <a href="#/"><span class="ic t-bus">🧳</span><span>全部旅行<small>切换或新建别的旅行</small></span></a>
@@ -1278,11 +1283,52 @@ function downloadIcs(name, events) {
   if (/MicroMessenger/i.test(navigator.userAgent)) toast('微信里加不了日历，请用手机浏览器打开');
   else toast('打开后点「添加」，会提前1天和3小时提醒');
 }
-function addCal(id) { const i = Store.docs[id].data; downloadIcs(itemName(i), [itemEvent(i)]); }
+function addCal(id) {
+  if (!REMOTE) { const i = Store.docs[id].data; return downloadIcs(itemName(i), [itemEvent(i)]); }
+  openCalSheet(id);
+}
 function addAllCal() {
   const items = Store.items(route()).filter(i => i.type !== 'expense' && i.date);
   if (!items.length) return toast('还没有可以加的行程');
-  downloadIcs(curTrip().name, items.map(itemEvent));
+  if (!REMOTE) return downloadIcs(curTrip().name, items.map(itemEvent));
+  openCalSheet(null);
+}
+const UA = navigator.userAgent;
+const isIOS = /iPhone|iPad|iPod/i.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const inWeChat = /MicroMessenger/i.test(UA);
+const calUrl = (tripId, itemId, dl) => `${CONFIG.supabaseUrl.replace(/\/$/, '')}/functions/v1/trip-ics?trip=${encodeURIComponent(tripId)}${itemId ? '&item=' + encodeURIComponent(itemId) : ''}${dl ? '&dl=1' : ''}`;
+function copyText(text, ok) {
+  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => toast(ok)).catch(() => prompt('复制下面的内容', text));
+}
+function openCalSheet(itemId) {
+  const tripId = route(), one = itemId ? Store.docs[itemId].data : null;
+  const https = calUrl(tripId, itemId), dl = calUrl(tripId, itemId, true), webcal = calUrl(tripId).replace(/^https?:/, 'webcal:');
+  const steps = arr => `<ol class="cal-steps">${arr.map(x => `<li>${x}</li>`).join('')}</ol>`;
+  const ios = `
+    ${one ? '' : `<div class="cal-card">
+      <div class="cal-h">🔄 订阅整个旅行 <span class="new-badge" style="background:var(--green)">推荐</span></div>
+      <div class="muted">以后谁改了行程，日历会自己跟着更新</div>
+      ${steps(['点下面的按钮，弹窗里点「订阅」', '下一页把<b>「移除提醒」关掉</b>（不然到时间不会提醒），再点右上角「添加」', '打开系统「日历」就能看到，出发前 1 天和 3 小时会提醒'])}
+      <a class="btn primary cal-btn" href="${webcal}">订阅到 iPhone 日历</a></div>`}
+    <div class="cal-card">
+      <div class="cal-h">➕ ${one ? '加到 iPhone 日历' : '只添加一次'}</div>
+      <div class="muted">${one ? '加这一项' : '把现在的行程加进去，之后的改动不会同步'}</div>
+      ${steps(['点下面的按钮', `打开的页面里点${one ? '「添加到日历」' : '右上角「添加全部」'}`])}
+      <a class="btn ${one ? 'primary' : ''} cal-btn" href="${https}">${one ? '加到日历' : '一次性添加全部'}</a></div>`;
+  const android = `
+    <div class="cal-card">
+      <div class="cal-h">📥 ${one ? '加到手机日历' : '导入到手机日历'}</div>
+      ${steps(['点下面的「下载日历文件」', '下载好后，点通知栏里的 <b>trip.ics</b>（或者浏览器菜单里的「下载」找到它）', '选择用<b>「日历」</b>打开，点「导入」或「保存」'])}
+      <a class="btn primary cal-btn" href="${dl}" download="trip.ics">下载日历文件</a></div>
+    ${one ? '' : `<div class="cal-card">
+      <div class="cal-h">🔄 订阅（华为、小米等部分手机支持）</div>
+      ${steps(['复制订阅链接', '打开手机「日历」→ 设置 / 管理日历 →「订阅日历」或「添加网络日历」→ 粘贴'])}
+      <button class="btn cal-btn" onclick="copyText('${https}', '订阅链接已复制')">复制订阅链接</button></div>`}`;
+  openSheet(`
+    <div class="sheet-head"><h2>📅 ${one ? '「' + esc(itemName(one)) + '」加到日历' : '加到手机日历'}</h2><button class="x" onclick="closeSheet()">✕</button></div>
+    ${inWeChat ? `<div class="banner" style="border-color:#e9b8a6;color:var(--warn)">⚠️ 微信里加不了日历：先点右上角「…」→「在浏览器打开」，再来这里点</div>` : ''}
+    ${isIOS ? ios : android}
+    <details class="cal-other"><summary>我用的是${isIOS ? '安卓手机' : ' iPhone'}</summary>${isIOS ? android : ios}</details>`);
 }
 
 // ====== 分享 ======
