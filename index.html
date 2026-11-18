@@ -1,0 +1,1156 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="一起旅行">
+<meta name="theme-color" content="#f3eedc">
+<title>一起去旅行</title>
+<style>
+  :root {
+    --bg: #f3eedc; --paper: #faf6ea; --white: #fffdf7; --text: #4a3a2c; --muted: #9a8b78; --line: #ebe2cc;
+    --brown: #5b3416; --blue: #4f86c0; --sky: #bfdeea; --pink: #dc9a9b; --butter: #fcf0d4; --yellow: #f6cf5c;
+    --orange: #eda04a; --nose: #e0482f; --green: #3f8a6e; --warn: #c8553d; --ok: #3f8a6e;
+    --round: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "PingFang SC", sans-serif;
+    --r: 28px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  body { background: radial-gradient(120% 60% at 80% 40%, #f8e3c8 0%, transparent 60%), var(--bg); background-attachment: fixed; }
+  #app { max-width: 520px; margin: 0 auto; padding: 14px 16px 120px; }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+  h1 { font: 800 22px/1.25 var(--round); color: var(--brown); margin: 0; }
+  h2 { font: 800 17px/1.3 var(--round); color: var(--brown); margin: 0; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .num { font: 900 54px/0.95 var(--round); color: var(--brown); letter-spacing: -1px; }
+
+  .top { display: flex; align-items: center; gap: 10px; padding: 6px 0 16px; }
+  .top .tt { flex: 1; min-width: 0; }
+  .back { font: 700 30px/1 var(--round); color: var(--brown); padding: 0 6px 4px 0; }
+  .icon-btn { border: 0; background: var(--white); border-radius: 16px; width: 42px; height: 42px; font-size: 18px; box-shadow: 0 2px 0 var(--line); }
+  .banner { background: var(--white); border: 2px dashed #d9cba9; color: var(--muted); border-radius: 18px; padding: 8px 12px; font-size: 12.5px; margin-bottom: 14px; }
+  .empty { text-align: center; color: var(--muted); padding: 40px 0; }
+  .sec-title { display: flex; align-items: center; gap: 6px; margin: 22px 4px 10px; }
+
+  /* 组件卡片 */
+  .w { position: relative; overflow: hidden; border-radius: var(--r); box-shadow: 0 6px 18px rgba(120,80,30,.08); margin-bottom: 14px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .grid2 .w { margin: 0; aspect-ratio: 1 / 1; padding: 16px; cursor: pointer; }
+  .w-cream { background: var(--white); }
+  .w-blue { background: var(--blue); }
+  .w-blue .num { color: #fdf3d6; }
+  .w-blue .lbl { color: #fdf3d6; }
+  .w .lbl { font: 700 15px/1.3 var(--round); color: var(--brown); margin-top: 4px; }
+  .w .right { text-align: right; position: relative; z-index: 2; }
+  .w .char { position: absolute; z-index: 1; pointer-events: none; }
+  .w .sun { position: absolute; width: 38px; height: 38px; z-index: 1; }
+
+  .w-grid { background-color: var(--sky);
+    background-image: linear-gradient(rgba(255,255,255,.75) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,.75) 2px, transparent 2px);
+    background-size: 24px 24px; background-position: -2px -2px; padding: 12px; display: flex; align-items: center; min-height: 150px; }
+  .w-grid .char { position: static; width: 104px; flex-shrink: 0; margin: 0 4px 0 -2px; }
+  .bubble-card { flex: 1; min-width: 0; background: var(--white); border-radius: 22px; padding: 14px 16px; position: relative; }
+  .bubble-card::before { content: ""; position: absolute; left: -7px; top: 50%; width: 14px; height: 14px; background: var(--white); transform: translateY(-50%) rotate(45deg); border-radius: 3px; }
+  .next-name { font: 800 16px/1.35 var(--round); color: var(--brown); margin: 4px 0 2px; word-break: break-all; }
+  .left-pill { display: inline-block; margin-top: 6px; font: 700 12.5px/1 var(--round); background: var(--butter); color: var(--brown); padding: 6px 10px; border-radius: 99px; }
+  .left-pill.soon { background: var(--nose); color: #fff; }
+
+  /* 清单 */
+  .w-todo { background: var(--butter); }
+  .todo-head { position: relative; height: 128px; background: var(--pink); }
+  .todo-head .palm { position: absolute; bottom: -4px; width: 64px; }
+  .todo-head .hand { position: absolute; left: 50%; top: 14px; transform: translateX(-50%) rotate(-8deg); font: italic 600 26px/1 "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive; color: #fdf3d6; white-space: nowrap; text-shadow: 0 2px 0 rgba(91,52,22,.25); }
+  .todo-head .char { left: 50%; bottom: -26px; width: 104px; transform: translateX(-50%); }
+  .todo-body { padding: 34px 22px 18px; }
+  .todo-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 15px; }
+  .box { width: 20px; height: 20px; border: 2px solid #cdbf9f; border-radius: 6px; background: var(--white); flex-shrink: 0; display: grid; place-items: center; font-size: 13px; color: #fff; }
+  .todo-row.done .box { background: var(--green); border-color: var(--green); }
+  .todo-row.done .tx-main { color: var(--muted); }
+  .todo-row.miss .tx-main { font-weight: 600; }
+  .todo-row .tx-main { flex: 1; min-width: 0; cursor: pointer; }
+  .todo-row .tx-main small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+  .mini { border: 0; border-radius: 99px; padding: 5px 11px; font-size: 12.5px; background: var(--white); color: var(--muted); }
+  .mini.go { background: var(--brown); color: #fdf3d6; font-weight: 600; }
+  .linkish { background: none; border: 0; color: var(--muted); font-size: 12px; padding: 6px 0 0; }
+
+  /* 每日行程 */
+  .daycard { background: var(--white); border-radius: 24px; padding: 14px 14px 8px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(120,80,30,.06); }
+  .daycard.today { box-shadow: 0 0 0 3px var(--yellow), 0 4px 12px rgba(120,80,30,.06); }
+  .dc-head { display: flex; align-items: baseline; gap: 8px; margin: 0 4px 8px; }
+  .dc-date { font: 900 26px/1 var(--round); color: var(--brown); }
+  .dc-week { font: 700 14px var(--round); color: var(--brown); }
+  .dc-n { margin-left: auto; font: 700 12px/1 var(--round); background: var(--butter); color: var(--brown); padding: 5px 9px; border-radius: 99px; }
+  .daycard.today .dc-n { background: var(--yellow); }
+  .ri { display: flex; gap: 12px; align-items: flex-start; padding: 10px 4px; border-top: 1.5px dashed var(--line); cursor: pointer; }
+  .dc-head + .ri, .daycard > .ri:first-child { border-top: 0; }
+  .ri.past { opacity: .5; }
+  .ic { width: 40px; height: 40px; border-radius: 14px; display: grid; place-items: center; font-size: 20px; flex-shrink: 0; }
+  .t-flight { background: #dbe8f6; } .t-train { background: #f7dcdc; } .t-bus { background: #d9eee3; }
+  .t-hotel { background: #fbecc4; } .t-ticket { background: #d8ecf3; } .t-expense { background: #fde3cf; }
+  .ri-body { flex: 1; min-width: 0; }
+  .ri-title { font-weight: 700; color: var(--text); word-break: break-all; }
+  .ri-title .tm { font: 800 15px var(--round); color: var(--brown); margin-right: 6px; }
+  .code { font-size: 11.5px; background: var(--butter); color: var(--brown); border-radius: 6px; padding: 1px 6px; font-weight: 600; margin-left: 4px; }
+  .ri-sub { font-size: 13px; color: var(--muted); }
+  .who { font-size: 12px; color: #b0703a; margin-top: 2px; }
+  .note { font-size: 12px; color: var(--muted); margin-top: 2px; white-space: pre-wrap; word-break: break-all; }
+  .cal { border: 0; background: var(--butter); border-radius: 12px; width: 36px; height: 36px; font-size: 16px; flex-shrink: 0; }
+  .night { display: block; width: 100%; text-align: left; border: 0; background: #f6f1e3; border-radius: 14px; font-size: 13px; color: var(--muted); padding: 7px 12px; margin: 4px 0 6px; }
+  .night.missing { background: #fbe4dc; color: var(--warn); font-weight: 600; }
+
+  /* 费用 */
+  .w-money { background: var(--yellow); padding: 18px; }
+  .w-money .char { right: 14px; top: 12px; width: 78px; }
+  .w-money .lbl { margin: 2px 0 12px; }
+  .money-inner { background: var(--white); border-radius: 20px; padding: 10px 14px 12px; position: relative; z-index: 2; }
+  .money-inner table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .money-inner td { padding: 7px 0; border-top: 1.5px dashed var(--line); }
+  .money-inner tr:first-child td { border-top: 0; }
+  .money-inner td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+  .tx { background: var(--butter); color: var(--brown); border-radius: 14px; padding: 9px 12px; margin-top: 8px; font: 800 15px var(--round); }
+  .tx.ok { background: #dcefe4; color: var(--ok); }
+
+  /* 首页旅行卡 */
+  .trip-w { display: flex; align-items: flex-end; min-height: 150px; padding: 18px; }
+  .trip-w .info { position: relative; z-index: 2; max-width: 64%; }
+  .trip-w .tname { font: 800 19px/1.3 var(--round); color: var(--brown); margin-top: 6px; }
+  .trip-w .char { right: -6px; bottom: -10px; width: 120px; }
+  .trip-w.w-blue .tname, .trip-w.w-blue .muted { color: #fdf3d6; }
+  .trip-w.w-pink { background: var(--pink); }
+  .trip-w.w-pink .num, .trip-w.w-pink .tname { color: #fffaf0; } .trip-w.w-pink .muted, .trip-w.w-pink .lbl { color: #fff4ea; }
+  .trip-w.w-grid { display: flex; }
+  .pill { display: inline-block; font: 700 12px/1 var(--round); padding: 6px 10px; border-radius: 99px; margin-top: 8px; background: var(--white); color: var(--warn); }
+  .pill.ok { color: var(--ok); } .pill.gray { color: var(--muted); }
+
+  .tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 18px 0; font-size: 13px; }
+  .tools button, .tools select { border: 0; background: var(--white); border-radius: 99px; padding: 8px 13px; font-size: 13px; color: var(--brown); box-shadow: 0 2px 0 var(--line); }
+  .tools select { display: inline-block; width: auto; min-height: 0; margin: 0; }
+  .sync { color: var(--muted); font-size: 12px; margin-left: auto; }
+
+  .bottom-bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: linear-gradient(rgba(243,238,220,0), var(--bg) 35%); display: flex; gap: 10px; justify-content: center; z-index: 5; }
+  .bottom-bar .btn { flex: 1; max-width: 244px; }
+  .btn { border: 0; border-radius: 99px; padding: 14px 16px; font: 800 15px/1.2 var(--round); background: var(--white); color: var(--brown);
+    box-shadow: 0 3px 0 var(--line), 0 6px 16px rgba(120,80,30,.1); }
+  .btn.primary { background: var(--brown); color: #fdf3d6; box-shadow: 0 3px 0 #3a200c, 0 6px 16px rgba(91,52,22,.25); }
+  .btn.danger { background: #fbe4dc; color: var(--warn); box-shadow: none; }
+
+  /* 弹层 */
+  .sheet { position: fixed; inset: 0; z-index: 10; }
+  .sheet.hidden { display: none; }
+  .sheet-bg { position: absolute; inset: 0; background: rgba(60,36,16,.35); }
+  .sheet-panel { position: absolute; left: 0; right: 0; bottom: 0; max-width: 520px; margin: 0 auto; background: var(--paper);
+    border-radius: 30px 30px 0 0; padding: 18px 18px calc(18px + env(safe-area-inset-bottom)); max-height: 92vh; overflow-y: auto; }
+  .sheet-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .x { border: 0; background: var(--white); border-radius: 99px; width: 34px; height: 34px; color: var(--brown); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .chip { border: 0; background: var(--white); border-radius: 99px; padding: 7px 12px; font-size: 13px; color: var(--brown); box-shadow: 0 2px 0 var(--line); }
+  .chip.on { background: var(--brown); color: #fdf3d6; box-shadow: none; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 10px; flex: 1; min-width: 0; }
+  input, select, textarea { display: block; width: 100%; margin-top: 4px; border: 2px solid var(--line); background: var(--white); border-radius: 14px;
+    padding: 9px 12px; font: inherit; font-size: 16px; color: var(--text); -webkit-appearance: none; appearance: none; min-height: 44px; outline: none; }
+  input:focus, select:focus, textarea:focus { border-color: var(--yellow); }
+  input[type=checkbox] { display: inline; width: auto; min-height: 0; margin: 0 5px 0 0; -webkit-appearance: checkbox; appearance: checkbox; accent-color: var(--brown); }
+  .row { display: flex; gap: 10px; }
+  .split { margin-bottom: 10px; }
+  .split .lbl { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  .ck { display: inline-flex; align-items: center; margin: 0 14px 0 0; color: var(--text); font-size: 15px; flex: none; }
+  .sheet-actions { display: flex; gap: 10px; margin-top: 8px; }
+  .sheet-actions .btn { flex: 1; }
+  .member-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+  .member-row input { margin: 0; }
+  .member-row button { border: 0; background: none; color: var(--muted); font-size: 18px; }
+  .toast { position: fixed; left: 50%; top: 20px; transform: translate(-50%, -90px); background: var(--brown); color: #fdf3d6; padding: 9px 18px;
+    border-radius: 99px; font-size: 14px; transition: transform .25s; z-index: 20; max-width: 90vw; }
+  .toast.show { transform: translate(-50%, 0); }
+  .photo-btn { display: block; text-align: center; margin: 0; cursor: pointer; }
+  .photo-btn input { display: none; }
+  /* 底部 Tab */
+  #app { padding-bottom: 130px; }
+  .tabbar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(10px + env(safe-area-inset-bottom)); width: calc(100% - 24px); max-width: 496px;
+    display: flex; align-items: center; justify-content: space-around; background: var(--white); border-radius: 30px; padding: 7px 6px;
+    box-shadow: 0 4px 0 var(--line), 0 10px 28px rgba(120,80,30,.16); z-index: 6; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; font: 700 11.5px/1.2 var(--round); color: var(--muted); padding: 6px 0; border-radius: 22px; position: relative; }
+  .tab .ti { font-size: 20px; line-height: 1.1; filter: grayscale(.6); opacity: .75; }
+  .tab.on { color: var(--brown); background: var(--butter); }
+  .tab.on .ti { filter: none; opacity: 1; }
+  .tab .dot { position: absolute; top: 5px; right: calc(50% - 16px); width: 8px; height: 8px; border-radius: 50%; background: var(--nose); }
+  .tab-add { width: 54px; height: 54px; border-radius: 50%; border: 0; background: var(--brown); color: #fdf3d6; font: 700 30px/1 var(--round);
+    margin: -26px 4px 0; box-shadow: 0 4px 0 #3a200c, 0 8px 18px rgba(91,52,22,.3); flex-shrink: 0; }
+
+  /* 费用页 */
+  .paid-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 14px; }
+  .paid-row .pn { width: 56px; font-weight: 700; color: var(--brown); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .paid-row .bar { flex: 1; height: 10px; background: #f3ead2; border-radius: 99px; overflow: hidden; }
+  .paid-row .bar i { display: block; height: 100%; background: var(--orange); border-radius: 99px; }
+  .paid-row .pv { font-variant-numeric: tabular-nums; color: var(--text); font-size: 13px; min-width: 92px; text-align: right; }
+  .btn.settle { display: block; width: 100%; margin-top: 14px; background: var(--brown); color: #fdf3d6; font-size: 17px; padding: 15px; box-shadow: 0 4px 0 #3a200c; position: relative; z-index: 2; }
+  .btn.settle.done { background: var(--white); color: var(--ok); box-shadow: 0 4px 0 #d9b94a; }
+  .amt { font: 800 15px var(--round); color: var(--brown); white-space: nowrap; padding-top: 9px; }
+  .settle-card { background: var(--white); border-radius: 24px; padding: 18px; margin-bottom: 8px; }
+  .settle-tx { display: flex; align-items: center; gap: 8px; background: var(--butter); border-radius: 18px; padding: 14px 16px; margin-top: 10px; font: 700 16px var(--round); color: var(--brown); }
+  .settle-tx .arrow { font-size: 13px; color: var(--muted); }
+  .settle-tx .sv { margin-left: auto; font: 900 22px var(--round); }
+  .settle-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 12px; }
+  .settle-table td { padding: 6px 0; border-top: 1.5px dashed var(--line); }
+  .settle-table tr:first-child td { border-top: 0; }
+  .settle-table td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* 菜单列表 */
+  .menu { background: var(--white); border-radius: 24px; padding: 6px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(120,80,30,.06); }
+  .menu > button, .menu > a { display: flex; align-items: center; gap: 12px; width: 100%; border: 0; background: none; text-align: left; padding: 10px; border-radius: 18px; font-size: 15px; font-weight: 600; color: var(--text); }
+  .menu > button + button, .menu > button + a { border-top: 1.5px dashed var(--line); border-radius: 0; }
+  .menu small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="sheet" class="sheet hidden"><div class="sheet-bg" onclick="closeSheet()"></div><div class="sheet-panel" id="sheetPanel"></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+// ====== 同步配置：填好这两项后，两个人就能共享同一份数据 ======
+const CONFIG = {
+  supabaseUrl: 'https://xfnpqvztkbhoacphwjpd.supabase.co',
+  supabaseKey: 'sb_publishable_uUFF860WZrgqZVFxzg5rpQ_v5MSIATf',
+};
+// ==============================================================
+
+const REMOTE = !!(CONFIG.supabaseUrl && CONFIG.supabaseKey);
+const $ = s => document.querySelector(s);
+const app = $('#app');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+const stable = o => JSON.stringify(o, (k, v) => v && typeof v === 'object' && !Array.isArray(v)
+  ? Object.keys(v).sort().reduce((a, x) => (a[x] = v[x], a), {}) : v);
+
+const TYPES = {
+  flight: { icon: '✈️', name: '机票', transport: true },
+  train: { icon: '🚄', name: '火车', transport: true },
+  bus: { icon: '🚌', name: '其他交通', transport: true },
+  hotel: { icon: '🏨', name: '酒店' },
+  ticket: { icon: '🎫', name: '门票活动' },
+  expense: { icon: '💰', name: '其他花费' },
+};
+
+// PARSER-START
+const WEEK = '日一二三四五六';
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const toDate = (date, time) => {
+  if (!date) return null;
+  const [y, m, d] = date.split('-').map(Number);
+  const [h, mi] = (time || '00:00').split(':').map(Number);
+  return new Date(y, m - 1, d, h || 0, mi || 0);
+};
+const addDays = (date, n) => { const d = toDate(date); d.setDate(d.getDate() + n); return ymd(d); };
+const daysBetween = (a, b) => Math.round((toDate(b) - toDate(a)) / 86400000);
+
+function fixYear(y, mo, d, trip) {
+  if (y) return `${y}-${pad(mo)}-${pad(d)}`;
+  const ref = trip && trip.start ? toDate(trip.start) : new Date();
+  const base = ref.getFullYear();
+  let best = null;
+  for (const yy of [base - 1, base, base + 1]) {
+    const c = new Date(yy, mo - 1, d);
+    if (!best || Math.abs(c - ref) < Math.abs(best - ref)) best = c;
+  }
+  return ymd(best);
+}
+
+function cleanPlace(p) {
+  return (p || '')
+    .replace(/^.*[号次日的购从在于由往至到开乘自订经]/, '')
+    .replace(/^.*航空(公司)?/, '')
+    .replace(/^达/, '')
+    .replace(/国际机场|机场/, '')
+    .trim();
+}
+
+function parseText(raw, trip) {
+  const s = raw.replace(/：/g, ':').replace(/，/g, ',').replace(/\s+/g, ' ');
+  const has = re => re.test(s);
+  const r = {};
+  const notes = [];
+
+  const trainCode = s.match(/(?<![A-Za-z0-9])([GDCZTKYSL]\d{1,4})次/)
+    || (has(/12306|铁路|火车|高铁|动车/) && s.match(/(?<![A-Za-z0-9])([GDCZTK]\d{1,4})(?![0-9])/));
+  const flightCode = s.match(/(?<![A-Za-z0-9])((?:[A-Z]{2}|[A-Z]\d|\d[A-Z])\s?\d{3,4})(?![0-9])/);
+
+  let type = 'expense';
+  if (trainCode) type = 'train';
+  else if (has(/酒店|宾馆|民宿|客栈|旅馆|饭店|度假村|入住|离店|退房|hotel|inn/i) && !has(/航班|起飞|登机/)) type = 'hotel';
+  else if (has(/航班|机票|起飞|登机|航空|机场/) || (flightCode && has(/航|飞|T\d/))) type = 'flight';
+  else if (has(/大巴|客运|汽车票|船票|轮渡|巴士/)) type = 'bus';
+  else if (has(/门票|入园|景区|演出|展览|乐园|票/)) type = 'ticket';
+  r.type = type;
+
+  // 日期
+  const dates = [];
+  const dre = /(\d{4})\s*[-\/.年]\s*(\d{1,2})\s*[-\/.月]\s*(\d{1,2})|(?<!\d)(\d{1,2})\s*月\s*(\d{1,2})\s*[日号]?|(?<![\d.:])(\d{1,2})[-\/](\d{1,2})(?![\d:\/])/g;
+  let m;
+  while ((m = dre.exec(s))) {
+    const y = m[1] ? +m[1] : null, mo = +(m[2] || m[4] || m[6]), d = +(m[3] || m[5] || m[7]);
+    if (mo < 1 || mo > 12 || d < 1 || d > 31) continue;
+    dates.push(fixYear(y, mo, d, trip));
+  }
+  // 时间
+  const times = [...s.matchAll(/(?<![\d:])([01]?\d|2[0-3]):([0-5]\d)(?!\d)/g)].map(x => pad(+x[1]) + ':' + x[2]);
+  // 金额
+  const num = '[¥￥]?\\s*(\\d+(?:\\.\\d{1,2})?)';
+  const am = s.match(new RegExp('(?:合计|共计|总价|总额|实付|订单金额|支付金额)\\s*:?\\s*' + num))
+    || s.match(/(?:[¥￥]|RMB|CNY)\s*(\d+(?:\.\d{1,2})?)/i)
+    || s.match(new RegExp('(?:金额|房费|票价|支付|价格|费用)\\s*:?\\s*' + num))
+    || s.match(/(\d+(?:\.\d{1,2})?)\s*元/);
+  if (am) r.amount = am[1];
+  // 备注信息
+  const ord = s.match(/(?:订单编号|订单号|订单|确认号|预订号)\s*:?\s*([A-Z0-9]{5,})/i);
+  if (ord) notes.push('订单 ' + ord[1]);
+  const seat = s.match(/(\d{1,2}车\d{1,3}[A-F]?号?)/);
+  if (seat) notes.push(seat[1]);
+  const gate = s.match(/检票口\s*:?\s*([A-Z0-9]+)/i);
+  if (gate) notes.push('检票口 ' + gate[1]);
+
+  const routeRe = /([\u4e00-\u9fa5]{2,12}(?:T\d)?)\s*(?:-|—|–|→|->|至|飞往|开往)\s*([\u4e00-\u9fa5]{2,12}(?:T\d)?)/;
+
+  if (type === 'train' || type === 'flight' || type === 'bus') {
+    if (type === 'train') {
+      r.code = trainCode[1];
+      const st = [...new Set([...s.matchAll(/([\u4e00-\u9fa5]{2,8})站/g)].map(x => cleanPlace(x[1])).filter(x => x.length >= 2))];
+      if (st[0]) r.from = st[0];
+      if (st[1]) r.to = st[1];
+      const to = s.match(/开往\s*([\u4e00-\u9fa5]{2,6})/);
+      if (!r.to && to) r.to = to[1].replace(/站$/, '');
+    }
+    if (type === 'flight' && flightCode) r.code = flightCode[1].replace(/\s/g, '');
+    if (!r.from || !r.to) {
+      const rt = s.match(routeRe);
+      if (rt) { r.from = r.from || cleanPlace(rt[1]); r.to = r.to || cleanPlace(rt[2]); }
+    }
+    if (type === 'flight' && (!r.from || !r.to)) {
+      const ap = [...s.matchAll(/([\u4e00-\u9fa5]{2,8}?)(?:国际)?机场\s*(T\d)?/g)].map(x => cleanPlace(x[1]) + (x[2] || '')).filter(x => x.length >= 2);
+      if (ap.length >= 2) { r.from = r.from || ap[0]; r.to = r.to || ap[1]; }
+    }
+    if (!r.from) { const x = s.match(/([\u4e00-\u9fa5]{2,12}(?:T\d)?)\s*(?:起飞|出发)/); if (x) r.from = cleanPlace(x[1]); }
+    if (!r.to) { const x = s.match(/(?:到达|抵达)\s*([\u4e00-\u9fa5]{2,12}(?:T\d)?)/); if (x) r.to = cleanPlace(x[1]); }
+    if (dates[0]) r.date = dates[0];
+    if (times[0]) r.time = times[0];
+    if (times[1] && r.date) {
+      r.endTime = times[1];
+      r.endDate = dates[1] && dates[1] >= r.date ? dates[1] : (times[1] < times[0] ? addDays(r.date, 1) : r.date);
+    }
+  } else if (type === 'hotel') {
+    const hn = s.match(/([\u4e00-\u9fa5A-Za-z0-9·()（）]{2,40}?(?:酒店|宾馆|民宿|客栈|旅馆|饭店|度假村|公寓|Hotel|Inn))/i);
+    const quoted = s.match(/[「“"《【]([^」”"》】]{2,40})[」”"》】]/g)?.map(x => x.slice(1, -1)).find(x => !/旅行|客服|携程|美团|飞猪|去哪儿|同程|艺龙|铁路/.test(x));
+    if (quoted) r.title = quoted;
+    else if (hn) r.title = hn[1].replace(/^.*(预订|预定|订购|已订|成功|您好|您)/, '').replace(/^[)）]/, '');
+    if (dates[0]) r.date = dates[0];
+    const nights = s.match(/(\d+)\s*晚/);
+    if (dates[1] && dates[1] > dates[0]) r.endDate = dates[1];
+    else if (r.date && nights) r.endDate = addDays(r.date, +nights[1]);
+    else if (r.date) r.endDate = addDays(r.date, 1);
+    const addr = s.match(/地址\s*:?\s*([^,，。;；\s]{4,40})/);
+    if (addr) notes.push(addr[1]);
+  } else {
+    if (type === 'ticket') { const tn = s.match(/([\u4e00-\u9fa5A-Za-z0-9]{2,16}?(?:门票|演出票|入场券|票))/); if (tn) r.title = tn[1].replace(/^.*(预订|预定|购买|已购|成功|您)/, ''); }
+    if (dates[0]) r.date = dates[0];
+    if (times[0]) r.time = times[0];
+  }
+  if (notes.length) r.note = notes.join(' · ');
+  return Object.fromEntries(Object.entries(r).filter(([, v]) => v !== undefined && v !== ''));
+}
+// PARSER-END
+
+const dayLabel = date => { const d = toDate(date); return `${d.getMonth() + 1}/${d.getDate()} 周${WEEK[d.getDay()]}`; };
+const fmtMoney = n => '¥' + (Math.round(n * 100) / 100).toLocaleString('zh-CN', { maximumFractionDigits: 2 });
+const todayStr = () => ymd(new Date());
+
+// ====== 数据存储（预览模式存本机；配置后同步到 Supabase）======
+const Store = {
+  docs: LS.get('tt_docs', {}),
+  pending: LS.get('tt_pending', []),
+  status: REMOTE ? 'idle' : 'local',
+  flushing: false,
+  save() { LS.set('tt_docs', this.docs); LS.set('tt_pending', this.pending); },
+  trips() { return Object.values(this.docs).filter(d => d.kind === 'trip').sort((a, b) => (b.data.start || '').localeCompare(a.data.start || '')); },
+  items(tripId) { return Object.values(this.docs).filter(d => d.kind === 'item' && d.trip_id === tripId).map(d => d.data); },
+  put(kind, tripId, data) {
+    const doc = { id: data.id, kind, trip_id: tripId, data, updated_at: new Date().toISOString() };
+    this.docs[doc.id] = doc;
+    if (REMOTE) this.pending.push({ op: 'up', doc });
+    this.save(); this.flush();
+  },
+  del(id) {
+    delete this.docs[id];
+    if (REMOTE) this.pending.push({ op: 'del', id });
+    this.save(); this.flush();
+  },
+  async api(path, opts = {}) {
+    const res = await fetch(CONFIG.supabaseUrl.replace(/\/$/, '') + '/rest/v1/' + path, {
+      ...opts,
+      headers: { apikey: CONFIG.supabaseKey, ...(CONFIG.supabaseKey.startsWith('eyJ') ? { Authorization: 'Bearer ' + CONFIG.supabaseKey } : {}), 'Content-Type': 'application/json', ...(opts.headers || {}) },
+    });
+    if (!res.ok) throw new Error(res.status + ' ' + await res.text());
+    return opts.method && opts.method !== 'GET' ? null : res.json();
+  },
+  async flush() {
+    if (!REMOTE || this.flushing) return;
+    this.flushing = true;
+    try {
+      while (this.pending.length) {
+        const p = this.pending[0];
+        if (p.op === 'up') {
+          const { id, kind, trip_id, data, updated_at } = p.doc;
+          await this.api('docs?on_conflict=id', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ id, kind, trip_id, data, updated_at }) });
+        } else {
+          await this.api('docs?id=eq.' + encodeURIComponent(p.id), { method: 'DELETE' });
+        }
+        this.pending.shift(); this.save();
+      }
+      this.setStatus('ok');
+    } catch (e) { console.warn(e); this.setStatus('offline'); }
+    finally { this.flushing = false; }
+  },
+  async pull(filter, match) {
+    if (!REMOTE) return false;
+    try {
+      const rows = await this.api('docs?select=*&' + filter);
+      const pend = new Set(this.pending.map(p => p.op === 'up' ? p.doc.id : p.id));
+      const remoteIds = new Set(rows.map(r => r.id));
+      let changed = false;
+      for (const d of Object.values(this.docs)) {
+        if (match(d) && !remoteIds.has(d.id) && !pend.has(d.id)) { delete this.docs[d.id]; changed = true; }
+      }
+      for (const r of rows) {
+        if (pend.has(r.id)) continue;
+        const cur = this.docs[r.id];
+        if (!cur || stable(cur.data) !== stable(r.data)) {
+          this.docs[r.id] = { id: r.id, kind: r.kind, trip_id: r.trip_id, data: r.data, updated_at: r.updated_at };
+          changed = true;
+        }
+      }
+      this.save();
+      this.setStatus(this.pending.length ? 'offline' : 'ok');
+      return changed;
+    } catch (e) { console.warn(e); this.setStatus('offline'); return false; }
+  },
+  setStatus(s) { this.status = s; const el = $('#sync'); if (el) el.textContent = statusText(); },
+};
+const statusText = () => ({ local: '📱 仅存本机', idle: '连接中…', ok: '☁️ 已同步', offline: '⚠️ 离线，联网后自动上传' }[Store.status]);
+const syncBadge = () => `<span id="sync" class="sync">${statusText()}</span>`;
+const modeBanner = () => REMOTE ? '' : `<div class="banner">👀 预览模式：数据只存在这台设备上。配置好同步之后，两个人才能看到同一份。</div>`;
+
+// ====== 页面 ======
+const route = () => { const m = location.hash.match(/^#\/t\/([\w-]+)/); return m ? m[1] : null; };
+const curTrip = () => Store.docs[route()]?.data;
+function render() { route() ? renderTrip(route()) : renderHome(); }
+
+function missingList(trip, items) {
+  const out = [];
+  if (!trip.start || !trip.end) return out;
+  const ign = new Set(trip.ignored || []);
+  const tr = items.filter(i => TYPES[i.type]?.transport);
+  if (!ign.has('out') && !tr.some(i => i.date === trip.start))
+    out.push({ key: 'out', text: `去程交通（${dayLabel(trip.start)}）`, preset: { type: 'flight', date: trip.start } });
+  if (trip.end !== trip.start && !ign.has('back') && !tr.some(i => i.date === trip.end))
+    out.push({ key: 'back', text: `回程交通（${dayLabel(trip.end)}）`, preset: { type: 'flight', date: trip.end } });
+  for (let n = trip.start; n < trip.end; n = addDays(n, 1)) {
+    if (!ign.has('night:' + n) && !hotelFor(items, n))
+      out.push({ key: 'night:' + n, text: `${dayLabel(n)} 晚上的住处`, preset: { type: 'hotel', date: n, endDate: addDays(n, 1) } });
+  }
+  return out;
+}
+const hotelFor = (items, night) => items.find(i => i.type === 'hotel' && i.date && i.date <= night && night < (i.endDate || addDays(i.date, 1)));
+
+// ====== 插画（原创小角色）======
+const B = '#5b3416';
+function face(x, y, s = 1, eyes = 'open') {
+  const eye = cx => eyes === 'sleepy'
+    ? `<path d="M${cx - 9} -4 a9 8 0 0 0 18 0 Z" fill="#fff" stroke="${B}" stroke-width="2.5" stroke-linejoin="round"/><circle cx="${cx + 1}" cy="-1" r="3.4" fill="${B}"/><path d="M${cx - 11} -4.5 h22" stroke="${B}" stroke-width="3.2" stroke-linecap="round"/>`
+    : eyes === 'happy'
+      ? `<path d="M${cx - 7} -2 q7 -10 14 0" fill="none" stroke="${B}" stroke-width="3.2" stroke-linecap="round"/>`
+      : `<ellipse cx="${cx}" cy="-6" rx="8" ry="10" fill="#fff" stroke="${B}" stroke-width="2.5"/><circle cx="${cx + 2}" cy="-9" r="4.2" fill="${B}"/><circle cx="${cx + 3.6}" cy="-10.6" r="1.4" fill="#fff"/>`;
+  return `<g transform="translate(${x} ${y}) scale(${s})">${eye(-15)}${eye(15)}
+    <ellipse cx="-28" cy="10" rx="8" ry="6" fill="#f08a6a" opacity=".55"/><ellipse cx="28" cy="10" rx="8" ry="6" fill="#f08a6a" opacity=".55"/>
+    <circle cx="0" cy="9" r="8" fill="#e0482f"/><circle cx="-2.5" cy="6.5" r="2.2" fill="#fff" opacity=".75"/>
+    <path d="M-5 22 q5 4 10 0" fill="none" stroke="${B}" stroke-width="2.5" stroke-linecap="round"/></g>`;
+}
+const svg = (vb, body) => (cls = 'char', style = '') => `<svg class="${cls}" style="${style}" viewBox="${vb}" aria-hidden="true">${body}</svg>`;
+const SUITCASE = svg('0 0 140 150', `
+  <rect x="47" y="6" width="46" height="32" rx="12" fill="none" stroke="${B}" stroke-width="7"/>
+  <rect x="12" y="28" width="116" height="120" rx="26" fill="#f6cf5c" stroke="${B}" stroke-width="4"/>
+  <path d="M42 31 v114 M98 31 v114" stroke="#eaa83e" stroke-width="9"/>
+  <path d="M24 46 q4 -8 12 -9" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".6"/>
+  ${face(70, 90)}
+  <g fill="#c98a2a"><circle cx="30" cy="114" r="1.8"/><circle cx="36" cy="120" r="1.8"/><circle cx="108" cy="114" r="1.8"/><circle cx="103" cy="120" r="1.8"/></g>`);
+const BLOB = svg('0 0 160 150', `
+  <path d="M8 160 C4 80 44 30 92 30 C136 30 166 80 160 160Z" fill="#eda04a" stroke="${B}" stroke-width="4"/>
+  <path d="M92 31 C88 18 92 9 100 5" fill="none" stroke="${B}" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M100 5 C113 0 122 9 117 18 C108 20 100 13 100 5Z" fill="#7cbf8e" stroke="${B}" stroke-width="3"/>
+  <path d="M34 72 q6 -11 15 -13" stroke="#fff" opacity=".5" stroke-width="6" fill="none" stroke-linecap="round"/>
+  ${face(94, 94, 1, 'sleepy')}
+  <g fill="#b8691f"><circle cx="58" cy="112" r="1.8"/><circle cx="64" cy="118" r="1.8"/></g>`);
+const CLOUD = svg('0 0 130 112', `
+  <path d="M28 98 C6 98 6 66 26 63 C24 38 54 30 66 45 C74 24 106 26 108 53 C128 54 128 98 104 98 Z" fill="#fbd3cf" stroke="${B}" stroke-width="4" stroke-linejoin="round"/>
+  ${face(66, 72, 0.78, 'happy')}
+  <g transform="translate(84 4) rotate(-14)">
+    <path d="M18 10 L10 0 L16 0 L28 9Z" fill="#4f86c0" stroke="${B}" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M6 14 C6 9 12 8 20 8 L36 8 C42 8 44 12 40 15 C36 18 26 18 18 18 L10 18 C7 18 6 16 6 14Z" fill="#fff" stroke="${B}" stroke-width="2.5"/>
+    <path d="M20 16 L14 26 L20 26 L30 16Z" fill="#4f86c0" stroke="${B}" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M8 12 L2 4 L7 4 L13 11" fill="#4f86c0" stroke="${B}" stroke-width="2" stroke-linejoin="round"/>
+  </g>`);
+const COIN = svg('0 0 100 100', `
+  <circle cx="50" cy="54" r="40" fill="#fde9a8" stroke="${B}" stroke-width="4"/>
+  <circle cx="50" cy="54" r="31" fill="none" stroke="#e5b443" stroke-width="4"/>
+  ${face(50, 56, 0.68, 'happy')}`);
+const PALM = svg('0 0 80 112', `
+  <path d="M42 112 C40 84 37 62 44 34" stroke="#8a5a34" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <g fill="#3f8a6e" stroke="#2b604c" stroke-width="2" stroke-linejoin="round">
+    <path d="M44 34 C30 20 12 24 4 38 C18 30 30 31 44 34Z"/><path d="M44 34 C58 18 74 22 80 36 C66 28 56 30 44 34Z"/>
+    <path d="M44 34 C36 14 44 2 58 0 C48 12 46 22 44 34Z"/><path d="M44 34 C30 34 20 46 16 60 C28 47 36 40 44 34Z"/>
+    <path d="M44 34 C58 36 68 48 68 62 C60 49 52 40 44 34Z"/></g>
+  <circle cx="40" cy="37" r="5" fill="#f6cf5c" stroke="${B}" stroke-width="1.5"/><circle cx="48" cy="38" r="5" fill="#f6cf5c" stroke="${B}" stroke-width="1.5"/>`);
+const SUN = (cls, style, color = B) => `<svg class="${cls}" style="${style}" viewBox="0 0 60 60" aria-hidden="true">
+  <circle cx="30" cy="30" r="9" fill="#f6cf5c" stroke="${color}" stroke-width="2.5"/>
+  <g stroke="${color}" stroke-width="2.5" stroke-linecap="round">${[0, 45, 90, 135, 180, 225, 270, 315].map(a => {
+    const r = a * Math.PI / 180, l = a % 90 ? 17 : 15;
+    return `<line x1="${30 + Math.cos(r) * 14}" y1="${30 + Math.sin(r) * 14}" x2="${30 + Math.cos(r) * (l + 6)}" y2="${30 + Math.sin(r) * (l + 6)}"/>`;
+  }).join('')}</g></svg>`;
+
+// ====== 页面 ======
+const P2 = n => String(n).padStart(2, '0');
+function tripBig(trip) {
+  const today = todayStr();
+  if (!trip.start) return { num: '??', lbl: '日期未定' };
+  if (today < trip.start) return { num: P2(daysBetween(today, trip.start)), lbl: '天后出发' };
+  if (today > trip.end) return { num: 'OK', lbl: '旅行结束啦' };
+  const n = daysBetween(trip.start, today) + 1;
+  return { num: P2(n), lbl: today === trip.start ? '今天出发！' : `旅途第 ${n} 天` };
+}
+function tripPill(t) {
+  const trip = t.data;
+  if (trip.end && trip.end < todayStr()) return `<span class="pill gray">已结束</span>`;
+  const n = missingList(trip, Store.items(t.id)).length;
+  return n ? `<span class="pill">还缺 ${n} 项没订</span>` : `<span class="pill ok">✓ 都订好了</span>`;
+}
+
+const HOME_LOOKS = [['w-cream', SUITCASE], ['w-blue', BLOB], ['w-pink', CLOUD], ['w-grid', SUITCASE]];
+function renderHome() {
+  const trips = Store.trips();
+  app.innerHTML = `
+    <header class="top"><div class="tt"><h1>一起去旅行</h1><div class="muted">和朋友共享的行程本</div></div>${syncBadge()}</header>
+    ${modeBanner()}
+    ${trips.map((t, k) => {
+      const b = tripBig(t.data), [look, ch] = HOME_LOOKS[k % HOME_LOOKS.length];
+      return `<a class="w trip-w ${look}" href="#/t/${t.id}">
+        <div class="info">
+          <div class="num">${b.num}</div><div class="lbl">${b.lbl}</div>
+          <div class="tname">${esc(t.data.name)}</div>
+          <div class="muted">${t.data.start ? dayLabel(t.data.start) + ' – ' + dayLabel(t.data.end) : '日期未定'} · ${t.data.members.map(esc).join('、')}</div>
+          ${tripPill(t)}
+        </div>${ch('char')}</a>`;
+    }).join('') || `<div class="empty">${SUITCASE('', 'width:130px;display:block;margin:0 auto 12px')}还没有旅行，新建一个吧</div>`}
+    <div class="bottom-bar">
+      ${!REMOTE && !trips.length ? `<button class="btn" onclick="loadDemo()">看看示例</button>` : ''}
+      <button class="btn primary" onclick="openTripEditor()">＋ 新建旅行</button>
+    </div>`;
+}
+
+function fmtLeft(ms) {
+  const m = Math.floor(ms / 60000), d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60), mi = m % 60;
+  if (d > 0) return `${d} 天 ${h} 小时`;
+  if (h > 0) return `${h} 小时 ${mi} 分`;
+  return `${mi} 分钟`;
+}
+const itemName = i => i.title || [i.code, i.from || i.to ? `${i.from || '?'}→${i.to || '?'}` : ''].filter(Boolean).join(' ') || TYPES[i.type].name;
+const itemStart = i => toDate(i.date, i.time || (i.type === 'hotel' ? '14:00' : '00:00'));
+
+function nextCard(items) {
+  const now = new Date();
+  const next = items.filter(i => i.type !== 'expense' && i.date).map(i => ({ i, at: itemStart(i) }))
+    .filter(x => x.at > now).sort((a, b) => a.at - b.at)[0];
+  let inner;
+  if (next) {
+    const i = next.i, left = next.at - now, soon = left < 3 * 3600e3, T = TYPES[i.type];
+    inner = `<div class="muted">${T.icon} 下一项</div>
+      <div class="next-name">${esc(itemName(i))}${i.type === 'hotel' ? ' 入住' : ''}</div>
+      <div class="muted">${dayLabel(i.date)} ${esc(i.time || '')}${i.from && i.to && i.title ? ' · ' + esc(i.from) + '→' + esc(i.to) : ''}</div>
+      <span class="left-pill ${soon ? 'soon' : ''}">${soon ? '该出发啦！' : ''}还有 ${fmtLeft(left)}</span>`;
+  } else {
+    inner = `<div class="next-name">接下来没有安排啦</div><div class="muted">上传一张订单截图，自动加进来</div>`;
+  }
+  return `<div class="w w-grid" ${next ? `onclick="openItem('${next.i.id}')"` : ''}>${CLOUD('char')}<div class="bubble-card">${inner}</div></div>`;
+}
+
+function checklist(trip, items, miss) {
+  const rows = [];
+  if (!trip.start || !trip.end) return rows;
+  const ign = new Set(trip.ignored || []), tr = items.filter(i => TYPES[i.type]?.transport);
+  const push = (key, label, found, sub) => {
+    if (found) rows.push({ done: true, label, sub, id: found.id });
+    else if (ign.has(key)) rows.push({ done: true, ign: true, label, key });
+    else rows.push({ done: false, label, k: miss.findIndex(m => m.key === key), key });
+  };
+  const out = tr.find(i => i.date === trip.start);
+  push('out', `去程交通 · ${dayLabel(trip.start)}`, out, out && itemName(out));
+  if (trip.end !== trip.start) { const back = tr.find(i => i.date === trip.end); push('back', `回程交通 · ${dayLabel(trip.end)}`, back, back && itemName(back)); }
+  for (let n = trip.start; n < trip.end; n = addDays(n, 1)) { const h = hotelFor(items, n); push('night:' + n, `${dayLabel(n)} 晚 · 住处`, h, h && (h.title || '酒店')); }
+  return rows;
+}
+function todoCard(trip, items, miss) {
+  const rows = checklist(trip, items, miss);
+  const body = rows.map(r => r.done
+    ? `<div class="todo-row done"><span class="box">✓</span>
+        <div class="tx-main" ${r.id ? `onclick="openItem('${r.id}')"` : ''}>${r.label}<small>${r.ign ? '不需要订' : esc(r.sub)}</small></div>
+        ${r.ign ? `<button class="mini" onclick="unignoreMiss('${r.key}')">要订</button>` : ''}</div>`
+    : `<div class="todo-row miss"><span class="box"></span>
+        <div class="tx-main" onclick="fillMiss(${r.k})">${r.label}<small>还没订，点这里补上</small></div>
+        <button class="mini" onclick="ignoreMiss('${r.key}')">不需要</button></div>`).join('');
+  return `<div class="w w-todo" id="todo">
+    <div class="todo-head">${PALM('palm', 'left:12px')}${PALM('palm', 'right:12px;transform:scaleX(-1)')}<div class="hand">Let's go!</div>${SUITCASE('char')}</div>
+    <div class="todo-body"><h2 style="margin-bottom:6px">☀️ 出发前清单</h2>${body}</div></div>`;
+}
+
+function itemRow(i) {
+  const T = TYPES[i.type] || TYPES.expense, sub = [];
+  if (i.type === 'hotel') {
+    const n = i.endDate ? daysBetween(i.date, i.endDate) : 1;
+    sub.push(`住 ${n} 晚${i.endDate ? ' · ' + dayLabel(i.endDate) + ' 退房' : ''}`);
+  } else if (i.from || i.to) sub.push(`${esc(i.from || '?')} → ${esc(i.to || '?')}`);
+  if (T.transport && i.endTime) sub.push(`${i.endDate && i.endDate !== i.date ? '次日 ' : ''}${esc(i.endTime)} 到`);
+  const who = [i.bookedBy ? `${esc(i.bookedBy)} 订的` : '', +i.amount ? `${fmtMoney(+i.amount)}${i.paidBy ? ' · ' + esc(i.paidBy) + ' 付' : ' · 还没写谁付'}` : ''].filter(Boolean).join(' · ');
+  const end = i.type === 'hotel' ? toDate(i.endDate || i.date, '12:00') : toDate(i.endDate || i.date, i.endTime || i.time || '23:59');
+  return `<div class="ri ${end && end < new Date() ? 'past' : ''}" onclick="openItem('${i.id}')">
+    <div class="ic t-${i.type}">${T.icon}</div>
+    <div class="ri-body">
+      <div class="ri-title">${i.time ? `<span class="tm">${esc(i.time)}</span>` : ''}${esc(i.title || T.name)}${i.code ? `<span class="code">${esc(i.code)}</span>` : ''}</div>
+      ${sub.length ? `<div class="ri-sub">${sub.join(' · ')}</div>` : ''}
+      ${who ? `<div class="who">${who}</div>` : ''}
+      ${i.note ? `<div class="note">${esc(i.note)}</div>` : ''}
+    </div>
+    ${i.type !== 'expense' && i.date ? `<button class="cal" onclick="event.stopPropagation();addCal('${i.id}')" title="加到手机日历">📅</button>` : ''}
+  </div>`;
+}
+
+function money(trip, items) {
+  const members = trip.members, paid = {}, owe = {};
+  members.forEach(m => { paid[m] = 0; owe[m] = 0; });
+  let total = 0, unpaid = 0;
+  for (const i of items) {
+    const a = +i.amount || 0;
+    if (!a) continue;
+    total += a;
+    if (!i.paidBy || !(i.paidBy in paid)) { unpaid++; continue; }
+    paid[i.paidBy] += a;
+    let sp = (i.splitAmong && i.splitAmong.length ? i.splitAmong : members).filter(m => m in owe);
+    if (!sp.length) sp = members;
+    sp.forEach(m => owe[m] += a / sp.length);
+  }
+  const bal = members.map(m => ({ m, v: Math.round((paid[m] - owe[m]) * 100) / 100 }));
+  const cred = bal.filter(b => b.v > 0.004).sort((a, b) => b.v - a.v);
+  const debt = bal.filter(b => b.v < -0.004).map(b => ({ m: b.m, v: -b.v })).sort((a, b) => b.v - a.v);
+  const tx = [];
+  let ci = 0, di = 0;
+  while (ci < cred.length && di < debt.length) {
+    const x = Math.min(cred[ci].v, debt[di].v);
+    tx.push({ from: debt[di].m, to: cred[ci].m, v: x });
+    cred[ci].v -= x; debt[di].v -= x;
+    if (cred[ci].v < 0.005) ci++;
+    if (debt[di].v < 0.005) di++;
+  }
+  return { total, paid, owe, tx, unpaid };
+}
+
+const TABS = [['home', '🏠', '概览'], ['plan', '🗓', '行程'], ['add', '', ''], ['fees', '💰', '费用'], ['us', '👫', '我们']];
+const curTab = () => (location.hash.match(/^#\/t\/[\w-]+\/(\w+)/) || [])[1] || 'home';
+const tabHref = (id, k) => `#/t/${id}${k === 'home' ? '' : '/' + k}`;
+const settleSig = mo => stable({ t: Math.round(mo.total * 100), tx: mo.tx.map(x => [x.from, x.to, Math.round(x.v * 100)]) });
+
+function renderTrip(id) {
+  const t = Store.docs[id];
+  if (!t) {
+    app.innerHTML = `<header class="top"><a href="#/" class="back">‹</a></header>
+      <div class="empty">${REMOTE && Store.status === 'idle' ? '加载中…' : '找不到这个旅行'}</div>`;
+    return;
+  }
+  const trip = t.data, items = Store.items(id), tab = curTab();
+  const miss = missingList(trip, items);
+  window._miss = miss;
+  const titles = { home: trip.name, plan: '每日行程', fees: '费用', us: '我们' };
+  const body = tab === 'plan' ? tabPlan(id, trip, items) : tab === 'fees' ? tabFees(id, trip, items) : tab === 'us' ? tabUs(id, trip) : tabHome(id, trip, items, miss);
+  app.innerHTML = `
+    <header class="top">
+      <a href="#/" class="back">‹</a>
+      <div class="tt"><h1>${esc(titles[tab] || trip.name)}</h1>
+        <div class="muted">${tab === 'home' ? '' : esc(trip.name) + ' · '}${trip.start ? `${dayLabel(trip.start)} – ${dayLabel(trip.end)}` : '日期未定'}</div></div>
+    </header>
+    ${modeBanner()}
+    ${body}
+    <nav class="tabbar">${TABS.map(([k, ic, name]) => k === 'add'
+      ? `<button class="tab-add" onclick="openAddMenu()" aria-label="添加">＋</button>`
+      : `<a class="tab ${k === tab ? 'on' : ''}" href="${tabHref(id, k)}"><span class="ti">${ic}</span>${name}${k === 'home' && miss.length ? `<i class="dot"></i>` : ''}</a>`).join('')}
+    </nav>`;
+}
+
+function tabHome(id, trip, items, miss) {
+  const big = tripBig(trip);
+  return `<div class="grid2">
+    <div class="w w-cream" onclick="openTripEditor('${id}')">
+      ${SUN('sun', 'left:14px;top:14px')}
+      <div class="right"><div class="num">${big.num}</div><div class="lbl">${big.lbl}</div></div>
+      ${SUITCASE('char', 'left:-10px;bottom:-26px;width:58%')}
+    </div>
+    <div class="w w-blue" onclick="document.getElementById('todo')?.scrollIntoView({behavior:'smooth'})">
+      <div class="num">${!trip.start ? '--' : miss.length ? P2(miss.length) : 'OK'}</div>
+      <div class="lbl">${!trip.start ? '先定好日期' : miss.length ? '项还没订' : '都订好啦'}</div>
+      ${SUN('sun', 'left:18px;bottom:22px', '#fdf3d6')}
+      ${BLOB('char', 'right:-22px;bottom:-26px;width:74%')}
+    </div></div>
+    ${nextCard(items)}
+    ${trip.start ? todoCard(trip, items, miss) : `<div class="w w-cream" style="padding:18px" onclick="openTripEditor('${id}')"><h2>先填一下出发和返回日期</h2><div class="muted">填好后会自动检查缺哪天的酒店、来回交通</div></div>`}`;
+}
+
+function tabPlan(id, trip, items) {
+  const ign = new Set(trip.ignored || []);
+  const days = new Set(items.filter(i => i.date).map(i => i.date));
+  if (trip.start && trip.end) for (let d = trip.start; d <= trip.end; d = addDays(d, 1)) days.add(d);
+  const today = todayStr();
+  const list = [...days].sort().map(d => {
+    const its = items.filter(i => i.date === d).sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+    let night = '';
+    if (trip.start && trip.end && d >= trip.start && d < trip.end) {
+      const h = hotelFor(items, d);
+      if (h) night = `<div class="night">🌙 今晚住：${esc(h.title || '酒店')}</div>`;
+      else if (ign.has('night:' + d)) night = `<div class="night">🌙 今晚不用订住处</div>`;
+      else night = `<button class="night missing" onclick="openItem(null,{type:'hotel',date:'${d}',endDate:'${addDays(d, 1)}'})">🌙 今晚还没订住处 · 点这里补上</button>`;
+    }
+    const dt = toDate(d), inTrip = trip.start && d >= trip.start && d <= trip.end;
+    return `<div class="daycard ${d === today ? 'today' : ''}" ${d === today ? 'id="today"' : ''}>
+      <div class="dc-head"><span class="dc-date">${dt.getMonth() + 1}/${dt.getDate()}</span><span class="dc-week">周${WEEK[dt.getDay()]}</span>
+        <span class="dc-n">${d === today ? '今天 · ' : ''}${inTrip ? `Day ${daysBetween(trip.start, d) + 1}` : '行程外'}</span></div>
+      ${its.map(itemRow).join('')}${night || (its.length ? '' : '<div class="night">还没有安排</div>')}
+    </div>`;
+  }).join('') || `<div class="empty">${CLOUD('', 'width:120px;display:block;margin:0 auto 10px')}还没有内容，点下面的 ＋ 添加</div>`;
+  return `<div class="chips" style="margin-bottom:14px">
+      <button class="chip" onclick="addAllCal()">📅 全部加到手机日历</button>
+      ${days.has(today) ? `<button class="chip" onclick="document.getElementById('today').scrollIntoView({behavior:'smooth'})">跳到今天</button>` : ''}
+    </div>${list}`;
+}
+
+function tabFees(id, trip, items) {
+  const mo = money(trip, items);
+  const n = trip.members.length;
+  const settled = trip.settled && trip.settled.sig === settleSig(mo);
+  const changed = trip.settled && !settled;
+  const maxPaid = Math.max(1, ...trip.members.map(m => mo.paid[m]));
+  const spend = items.filter(i => +i.amount).sort((a, b) => (b.date + (b.time || '')).localeCompare(a.date + (a.time || '')));
+  return `
+    <div class="w w-money">${COIN('char')}
+      <div class="lbl" style="margin:0">一共花了</div>
+      <div class="num" style="font-size:46px;margin:6px 0 4px">${fmtMoney(mo.total)}</div>
+      <div class="lbl" style="font-size:13px;margin-bottom:14px">${n} 个人 · 人均约 ${fmtMoney(mo.total / Math.max(1, n))}</div>
+      <div class="money-inner">
+        ${trip.members.map(m => `<div class="paid-row"><span class="pn">${esc(m)}</span>
+          <span class="bar"><i style="width:${Math.round(mo.paid[m] / maxPaid * 100)}%"></i></span>
+          <span class="pv">已付 ${fmtMoney(mo.paid[m])}</span></div>`).join('')}
+      </div>
+      ${settled
+        ? `<button class="btn settle done" onclick="openSettle()">✓ 已结清 · 查看结算</button>`
+        : `<button class="btn settle" onclick="openSettle()">一键结算</button>`}
+      ${changed ? `<div class="lbl" style="font-size:12.5px;text-align:center;margin-top:8px">结清之后又有新的花费，需要重新结算</div>` : ''}
+    </div>
+    ${mo.unpaid ? `<div class="banner" style="border-color:#e9b8a6;color:var(--warn)">有 ${mo.unpaid} 笔还没写是谁付的，结算时不会算进去</div>` : ''}
+    <div class="sec-title"><h2>🧾 花费明细</h2><button class="chip" style="margin-left:auto" onclick="openItem(null,{type:'expense',date:todayStr()>=(curTrip().start||'')&&todayStr()<=(curTrip().end||'')?todayStr():(curTrip().start||todayStr())})">＋ 记一笔</button></div>
+    <div class="daycard">
+      ${spend.map(i => {
+        const T = TYPES[i.type];
+        const sp = i.splitAmong && i.splitAmong.length && i.splitAmong.length < n ? ` · 只算 ${i.splitAmong.map(esc).join('、')}` : '';
+        return `<div class="ri" onclick="openItem('${i.id}')"><div class="ic t-${i.type}">${T.icon}</div>
+          <div class="ri-body"><div class="ri-title">${esc(itemName(i))}</div>
+            <div class="ri-sub">${dayLabel(i.date)} · ${i.paidBy ? esc(i.paidBy) + ' 付' : '<b style="color:var(--warn)">还没写谁付</b>'}${sp}</div></div>
+          <div class="amt">${fmtMoney(+i.amount)}</div></div>`;
+      }).join('') || `<div class="empty" style="padding:24px 0">还没有花费记录</div>`}
+    </div>`;
+}
+
+function openSettle() {
+  const id = route(), trip = curTrip(), mo = money(trip, Store.items(id));
+  const settled = trip.settled && trip.settled.sig === settleSig(mo);
+  openSheet(`
+    <div class="sheet-head"><h2>🧾 一键结算</h2><button class="x" onclick="closeSheet()">✕</button></div>
+    <div class="settle-card">
+      ${COIN('', 'width:72px;display:block;margin:0 auto 6px')}
+      <div class="muted" style="text-align:center">总共 ${fmtMoney(mo.total)} · ${trip.members.length} 人平摊后</div>
+      ${mo.tx.length ? mo.tx.map(x => `<div class="settle-tx"><b>${esc(x.from)}</b><span class="arrow">转给 →</span><b>${esc(x.to)}</b><span class="sv">${fmtMoney(x.v)}</span></div>`).join('')
+        : `<div class="settle-tx" style="justify-content:center">两清啦，谁都不用转 🎉</div>`}
+      <table class="settle-table"><tr><td class="muted"></td><td class="muted">已付</td><td class="muted">应摊</td></tr>
+        ${trip.members.map(m => `<tr><td>${esc(m)}</td><td>${fmtMoney(mo.paid[m])}</td><td>${fmtMoney(mo.owe[m])}</td></tr>`).join('')}</table>
+      ${mo.unpaid ? `<div class="muted" style="color:var(--warn);margin-top:8px">⚠️ 有 ${mo.unpaid} 笔没写谁付的，没算进来</div>` : ''}
+    </div>
+    <div class="sheet-actions">
+      <button class="btn" onclick="copySettle()">复制发微信</button>
+      ${settled ? `<button class="btn" onclick="markSettled(false)">取消已结清</button>` : `<button class="btn primary" onclick="markSettled(true)">标记已结清</button>`}
+    </div>
+    ${settled ? `<div class="muted" style="text-align:center;margin-top:10px">已于 ${esc(trip.settled.at)} 结清</div>` : ''}`);
+}
+function settleText() {
+  const trip = curTrip(), mo = money(trip, Store.items(route()));
+  return [`「${trip.name}」AA 结算`, `总共 ${fmtMoney(mo.total)}，${trip.members.length} 人`,
+    ...trip.members.map(m => `${m}：已付 ${fmtMoney(mo.paid[m])}，应摊 ${fmtMoney(mo.owe[m])}`),
+    '———',
+    ...(mo.tx.length ? mo.tx.map(x => `👉 ${x.from} 转给 ${x.to} ${fmtMoney(x.v)}`) : ['两清，不用转账 🎉'])].join('\n');
+}
+function copySettle() {
+  const text = settleText();
+  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+    .then(() => toast('已复制，去微信粘贴吧')).catch(() => prompt('复制下面的内容', text));
+}
+function markSettled(on) {
+  const mo = money(curTrip(), Store.items(route()));
+  const d = new Date();
+  updateTrip(t => { t.settled = on ? { sig: settleSig(mo), at: `${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}` } : null; });
+  closeSheet(); toast(on ? '已标记结清 ✓' : '已取消');
+}
+
+function tabUs(id, trip) {
+  const me = LS.get('tt_me_' + id, trip.members[0]);
+  return `
+    <div class="w w-cream" style="padding:18px">
+      <h2>👫 一起去的人</h2>
+      <div class="muted" style="margin:4px 0 12px">点一下选「我是谁」，新加的行程会默认记在你名下</div>
+      <div class="chips">${trip.members.map(m => `<button class="chip ${m === me ? 'on' : ''}" data-m="${esc(m)}" onclick="setMe(this.dataset.m);render()">${m === me ? '我 · ' : ''}${esc(m)}</button>`).join('')}</div>
+    </div>
+    <div class="menu">
+      <button onclick="share()"><span class="ic t-ticket">🔗</span><span>分享给朋友<small>复制链接，发到微信</small></span></button>
+      <button onclick="addAllCal()"><span class="ic t-flight">📅</span><span>全部加到手机日历<small>提前 1 天和 3 小时提醒</small></span></button>
+      <button onclick="openTripEditor('${id}')"><span class="ic t-hotel">⚙️</span><span>旅行设置<small>名称、日期、成员</small></span></button>
+      <a href="#/"><span class="ic t-bus">🧳</span><span>全部旅行<small>切换或新建别的旅行</small></span></a>
+    </div>
+    <div class="w w-cream" style="padding:16px 18px">
+      <h2 style="font-size:15px">📱 怎么用起来最顺手</h2>
+      <div class="muted" style="margin-top:6px;line-height:1.7">在微信里打开链接后，点右上角「…」→「在浏览器打开」，再「添加到主屏幕」，以后就像 App 一样从桌面打开。加日历和上传截图在浏览器里更好用。</div>
+    </div>
+    <div style="text-align:center;margin:8px 0 20px">${syncBadge()}</div>`;
+}
+
+function openAddMenu() {
+  openSheet(`
+    <div class="sheet-head"><h2>添加点什么</h2><button class="x" onclick="closeSheet()">✕</button></div>
+    <div class="menu" style="margin:0">
+      <button onclick="openPaste()"><span class="ic t-flight">📷</span><span>截图 / 短信识别<small>上传订单截图或粘贴短信，自动填好</small></span></button>
+      <button onclick="openItem()"><span class="ic t-hotel">✍️</span><span>手动添加行程<small>机票、火车、酒店、门票</small></span></button>
+      <button onclick="openItem(null,{type:'expense',date:todayStr()>=(curTrip().start||'')&&todayStr()<=(curTrip().end||'')?todayStr():(curTrip().start||todayStr())})"><span class="ic t-expense">💰</span><span>记一笔花费<small>吃饭、打车、门票…</small></span></button>
+    </div>`);
+}
+
+function unignoreMiss(key) { updateTrip(t => { t.ignored = (t.ignored || []).filter(x => x !== key); }); }
+
+// ====== 弹层 ======
+function openSheet(html) { $('#sheetPanel').innerHTML = html; $('#sheet').classList.remove('hidden'); $('#sheetPanel').scrollTop = 0; }
+function closeSheet() { $('#sheet').classList.add('hidden'); }
+let toastTimer;
+function toast(msg) { const el = $('#toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2200); }
+
+// ====== 行程条目 ======
+let editing = null, editingIsEdit = false;
+function openItem(id, preset) {
+  const tripId = route(), trip = curTrip();
+  const me = LS.get('tt_me_' + tripId, trip.members[0]);
+  editingIsEdit = !!id;
+  editing = id ? { splitAmong: [], ...Store.docs[id].data } : {
+    id: uid(), type: 'flight', date: trip.start || todayStr(), time: '', endDate: '', endTime: '', title: '', code: '', from: '', to: '',
+    bookedBy: me, paidBy: me, amount: '', splitAmong: [], note: '', ...preset,
+  };
+  if (editing.type === 'hotel' && !editing.endDate && editing.date) editing.endDate = addDays(editing.date, 1);
+  drawItemForm();
+}
+function drawItemForm() {
+  const trip = curTrip(), e = editing, T = TYPES[e.type];
+  const isHotel = e.type === 'hotel', isTr = !!T.transport, isExp = e.type === 'expense';
+  const mopts = (sel, empty) => `<option value="">${empty}</option>` + trip.members.map(m => `<option value="${esc(m)}" ${m === sel ? 'selected' : ''}>${esc(m)}</option>`).join('');
+  openSheet(`
+    <div class="sheet-head"><h2>${editingIsEdit ? '编辑' : '添加'}</h2><button class="x" onclick="closeSheet()">✕</button></div>
+    <div class="chips">${Object.entries(TYPES).map(([k, v]) => `<button class="chip ${k === e.type ? 'on' : ''}" onclick="switchType('${k}')">${v.icon} ${v.name}</button>`).join('')}</div>
+    <label>${isHotel ? '酒店名称' : isExp ? '花在哪了' : isTr ? '名称（可不填）' : '名称'}
+      <input id="f_title" value="${esc(e.title)}" placeholder="${isHotel ? '例如：春熙路亚朵酒店' : isExp ? '例如：火锅、打车' : isTr ? '不填就显示航班号/车次' : '例如：熊猫基地门票'}"></label>
+    ${isTr ? `<label>${e.type === 'flight' ? '航班号' : e.type === 'train' ? '车次' : '班次'}<input id="f_code" value="${esc(e.code)}" autocapitalize="characters"></label>
+      <div class="row"><label>出发地<input id="f_from" value="${esc(e.from)}"></label><label>目的地<input id="f_to" value="${esc(e.to)}"></label></div>` : ''}
+    <div class="row">
+      <label>${isHotel ? '入住日期' : isTr ? '出发日期' : '日期'}<input type="date" id="f_date" value="${esc(e.date)}"></label>
+      ${isExp ? '' : `<label>${isHotel ? '入住时间（可不填）' : isTr ? '出发时间' : '时间'}<input type="time" id="f_time" value="${esc(e.time)}"></label>`}
+    </div>
+    ${isHotel ? `<div class="row"><label>退房日期<input type="date" id="f_endDate" value="${esc(e.endDate)}"></label></div>` : ''}
+    ${isTr ? `<div class="row"><label>到达日期<input type="date" id="f_endDate" value="${esc(e.endDate)}"></label><label>到达时间<input type="time" id="f_endTime" value="${esc(e.endTime)}"></label></div>` : ''}
+    <div class="row">
+      ${isExp ? '' : `<label>谁订的<select id="f_bookedBy">${mopts(e.bookedBy, '—')}</select></label>`}
+      <label>谁付的钱<select id="f_paidBy">${mopts(e.paidBy, '还没付 / 不记账')}</select></label>
+    </div>
+    <label>金额（元）<input id="f_amount" type="number" inputmode="decimal" value="${esc(e.amount)}" placeholder="0"></label>
+    <div class="split"><div class="lbl">谁来平摊</div>
+      ${trip.members.map(m => `<label class="ck"><input type="checkbox" class="f_split" value="${esc(m)}" ${!e.splitAmong.length || e.splitAmong.includes(m) ? 'checked' : ''}>${esc(m)}</label>`).join('')}
+    </div>
+    <label>备注<textarea id="f_note" rows="2" placeholder="订单号、座位、地址…">${esc(e.note)}</textarea></label>
+    <div class="sheet-actions">
+      ${editingIsEdit ? `<button class="btn danger" onclick="delItem()">删除</button>` : ''}
+      <button class="btn primary" onclick="saveItem()">保存</button>
+    </div>`);
+}
+function readForm() {
+  for (const k of ['title', 'code', 'from', 'to', 'date', 'time', 'endDate', 'endTime', 'bookedBy', 'paidBy', 'amount', 'note']) {
+    const el = $('#f_' + k);
+    if (el) editing[k] = el.value.trim();
+  }
+  const cks = [...document.querySelectorAll('.f_split')];
+  if (cks.length) { const on = cks.filter(c => c.checked).map(c => c.value); editing.splitAmong = on.length === cks.length ? [] : on; }
+}
+function switchType(k) {
+  readForm();
+  const was = editing.type;
+  editing.type = k;
+  if (k === 'hotel' && editing.date && (!editing.endDate || editing.endDate <= editing.date)) editing.endDate = addDays(editing.date, 1);
+  if (was === 'hotel' && k !== 'hotel') editing.endDate = '';
+  drawItemForm();
+}
+function saveItem() {
+  readForm();
+  if (!editing.date) return toast('请填日期');
+  if (editing.type === 'hotel' && (!editing.endDate || editing.endDate <= editing.date)) editing.endDate = addDays(editing.date, 1);
+  if (editing.code) editing.code = editing.code.toUpperCase();
+  Store.put('item', route(), { ...editing });
+  closeSheet(); render(); toast('已保存');
+}
+function delItem() {
+  if (!confirm('确定删除这一条？')) return;
+  Store.del(editing.id); closeSheet(); render(); toast('已删除');
+}
+
+// ====== 缺失提醒 ======
+function fillMiss(k) { openItem(null, window._miss[k].preset); }
+function updateTrip(fn) { const id = route(); const trip = { ...curTrip() }; fn(trip); Store.put('trip', id, trip); render(); }
+function ignoreMiss(key) { updateTrip(t => { t.ignored = [...new Set([...(t.ignored || []), key])]; }); }
+function resetIgnore() { updateTrip(t => { t.ignored = []; }); }
+function setMe(v) { LS.set('tt_me_' + route(), v); }
+
+// ====== 粘贴识别 ======
+const SAMPLES = [
+  '【铁路客服】订单EA12345678,小王您已购11月20日G7340次3车12F号,杭州东站08:05开,检票口A12,票价¥538.5。',
+  '【携程旅行】您预订的2026年11月22日 东方航空MU5402 成都天府T1-杭州萧山T3 19:30-22:05 已出票，订单号2891234567，总价￥1260。',
+  '【携程旅行】您已成功预订成都春熙路亚朵酒店，入住11月20日，离店11月22日，共2晚，房费￥836，地址:锦江区红星路三段8号。',
+];
+function openPaste() {
+  openSheet(`
+    <div class="sheet-head"><h2>📷 识别订单</h2><button class="x" onclick="closeSheet()">✕</button></div>
+    <p class="muted" style="margin-top:0">上传订单截图、拍张照，或者粘贴短信文字，会自动认出日期、时间、车次和地点，你确认后再保存。照片只在手机上识别，不会上传。</p>
+    <label class="btn primary photo-btn">📷 上传截图 / 拍照识别
+      <input type="file" accept="image/*" multiple onchange="ocrFiles(this.files)" hidden></label>
+    <div id="ocrStatus" class="muted" style="text-align:center;min-height:20px;margin:6px 0"></div>
+    <textarea id="pasteBox" rows="6" placeholder="或者长按这里粘贴短信文字…"></textarea>
+    <div class="chips" style="margin-top:8px">
+      ${navigator.clipboard && navigator.clipboard.readText ? `<button class="chip" onclick="pasteClip()">从剪贴板读取</button>` : ''}
+      <button class="chip" onclick="trySample()">试一条示例短信</button>
+    </div>
+    <div class="sheet-actions"><button class="btn" onclick="doParse()">识别文字</button></div>`);
+}
+
+// ====== 图片识别（在手机本地运行，免费，不上传到任何服务器）======
+const OCR_CDN = 'https://cdn.jsdelivr.net/npm/';
+let ocrWorker = null;
+function loadScript(src) {
+  return new Promise((ok, fail) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = fail; document.head.appendChild(s); });
+}
+async function getOcr(status) {
+  if (ocrWorker) return ocrWorker;
+  status('第一次使用，正在下载识别字库（约 9MB，之后就快了）…');
+  if (!window.Tesseract) await loadScript(OCR_CDN + 'tesseract.js@5.1.1/dist/tesseract.min.js');
+  ocrWorker = await Tesseract.createWorker(['chi_sim', 'eng'], 1, {
+    workerPath: OCR_CDN + 'tesseract.js@5.1.1/dist/worker.min.js',
+    corePath: OCR_CDN + 'tesseract.js-core@5.1.1',
+    // 字库默认从 jsdelivr 的 @tesseract.js-data/<语言>/4.0.0_best_int 下载
+    logger: m => { if (m.status === 'recognizing text') status(`识别中… ${Math.round(m.progress * 100)}%`); },
+  });
+  return ocrWorker;
+}
+function cleanOcr(t) {
+  return t
+    .replace(/([\u4e00-\u9fa5，。：；、（）【】])[ \t]+/g, '$1').replace(/[ \t]+(?=[\u4e00-\u9fa5，。：；、（）【】,])/g, '')
+    .replace(/(票价|金额|实付|合计|总价|房费|支付|价格)[:：]?\s*[Y羊]\s*(?=\d)/g, '$1¥')
+    .replace(/(\d)[ \t]+(?=[:：.\d])/g, '$1').replace(/([:：])[ \t]+(?=\d)/g, '$1')
+    .replace(/[ \t]+/g, ' ').replace(/\n{2,}/g, '\n').trim();
+}
+async function ocrFiles(files) {
+  if (!files || !files.length) return;
+  const st = $('#ocrStatus'), status = m => { if (st) st.textContent = m; };
+  try {
+    const w = await getOcr(status);
+    const texts = [];
+    for (const f of files) {
+      status('识别中…');
+      const { data } = await w.recognize(f);
+      texts.push(cleanOcr(data.text));
+    }
+    const txt = texts.join('\n');
+    if ($('#pasteBox')) $('#pasteBox').value = txt;
+    if (!txt.trim()) return status('没认出文字，换一张清楚点的截图试试');
+    status('');
+    doParse();
+  } catch (e) {
+    console.warn(e);
+    status('识别失败：网络不好或者图片太大，可以重试，或者直接粘贴文字');
+  }
+}
+let sampleIdx = 0;
+function trySample() { $('#pasteBox').value = SAMPLES[sampleIdx++ % SAMPLES.length]; }
+async function pasteClip() { try { $('#pasteBox').value = await navigator.clipboard.readText(); } catch { toast('读取不了剪贴板，请长按手动粘贴'); } }
+function doParse() {
+  const txt = $('#pasteBox').value;
+  if (!txt.trim()) return toast('先粘贴内容');
+  const r = parseText(txt, curTrip());
+  openItem(null, r);
+  toast(r.date ? '识别好了，检查一下再保存' : '没认出日期，手动补一下');
+}
+
+// ====== 旅行设置 ======
+let editingTripId = null;
+function openTripEditor(id) {
+  editingTripId = id || null;
+  const t = id ? Store.docs[id].data : { name: '', start: '', end: '', members: ['我', '朋友'] };
+  openSheet(`
+    <div class="sheet-head"><h2>${id ? '旅行设置' : '新建旅行'}</h2><button class="x" onclick="closeSheet()">✕</button></div>
+    <label>旅行名称<input id="t_name" value="${esc(t.name)}" placeholder="例如：成都吃吃吃"></label>
+    <div class="row">
+      <label>出发日期<input type="date" id="t_start" value="${esc(t.start)}"></label>
+      <label>返回日期<input type="date" id="t_end" value="${esc(t.end)}"></label>
+    </div>
+    <div class="split"><div class="lbl">一起去的人（AA 按这些人算）</div>
+      <div id="t_members">${t.members.map((m, k) => memberRow(m, k)).join('')}</div>
+      <button class="chip" onclick="addMemberRow()">＋ 加一个人</button>
+    </div>
+    <div class="sheet-actions">
+      ${id ? `<button class="btn danger" onclick="delTrip()">删除旅行</button>` : ''}
+      <button class="btn primary" onclick="saveTrip()">保存</button>
+    </div>`);
+}
+const memberRow = (m, k) => `<div class="member-row"><input class="t_member" data-idx="${k}" value="${esc(m)}" placeholder="名字"><button onclick="this.parentNode.remove()">✕</button></div>`;
+function addMemberRow() { $('#t_members').insertAdjacentHTML('beforeend', memberRow('', -1)); }
+function saveTrip() {
+  const name = $('#t_name').value.trim() || '我们的旅行';
+  let start = $('#t_start').value, end = $('#t_end').value;
+  if (start && !end) end = start;
+  if (end && !start) start = end;
+  if (start && end < start) [start, end] = [end, start];
+  const rows = [...document.querySelectorAll('.t_member')].map(el => ({ idx: +el.dataset.idx, name: el.value.trim() })).filter(r => r.name);
+  if (!rows.length) return toast('至少要有一个人');
+  if (new Set(rows.map(r => r.name)).size !== rows.length) return toast('名字不能重复');
+  const id = editingTripId || uid();
+  const old = editingTripId ? Store.docs[id].data : null;
+  if (old) {
+    // 改名的成员，同步改掉条目里的名字
+    const ren = {};
+    rows.forEach(r => { if (r.idx >= 0 && old.members[r.idx] && old.members[r.idx] !== r.name) ren[old.members[r.idx]] = r.name; });
+    if (Object.keys(ren).length) for (const it of Store.items(id)) {
+      const n = { ...it, bookedBy: ren[it.bookedBy] || it.bookedBy, paidBy: ren[it.paidBy] || it.paidBy, splitAmong: (it.splitAmong || []).map(x => ren[x] || x) };
+      if (stable(n) !== stable(it)) Store.put('item', id, n);
+    }
+    const meKey = 'tt_me_' + id, me = LS.get(meKey, null);
+    if (me && ren[me]) LS.set(meKey, ren[me]);
+  }
+  Store.put('trip', id, { ...(old || {}), id, name, start, end, members: rows.map(r => r.name), ignored: old?.ignored || [] });
+  closeSheet();
+  if (!editingTripId) location.hash = '#/t/' + id; else render();
+  toast('已保存');
+}
+function delTrip() {
+  if (!confirm('删除整个旅行和里面所有内容？删了就找不回来了')) return;
+  const id = editingTripId;
+  Store.items(id).forEach(i => Store.del(i.id));
+  Store.del(id);
+  closeSheet(); location.hash = '#/';
+}
+
+// ====== 日历提醒 ======
+const icsEsc = s => String(s || '').replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/[,;]/g, m => '\\' + m);
+const icsDT = d => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+function itemEvent(i) {
+  const T = TYPES[i.type];
+  const start = toDate(i.date, i.time || (i.type === 'hotel' ? '14:00' : '09:00'));
+  let end = i.endTime ? toDate(i.endDate || i.date, i.endTime) : null;
+  if (!end || end <= start) end = new Date(start.getTime() + 3600e3);
+  const title = `${T.icon} ${itemName(i)}${i.type === 'hotel' ? ' 入住' : ''}`;
+  const desc = [i.from || i.to ? `${i.from || ''} → ${i.to || ''}` : '', i.note, i.bookedBy ? i.bookedBy + ' 订的' : ''].filter(Boolean).join('\n');
+  const now = new Date();
+  return [
+    'BEGIN:VEVENT', `UID:${i.id}@trip-share`,
+    `DTSTAMP:${now.getUTCFullYear()}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}T${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}00Z`,
+    `DTSTART:${icsDT(start)}`, `DTEND:${icsDT(end)}`,
+    `SUMMARY:${icsEsc(title)}`, `LOCATION:${icsEsc(i.type === 'hotel' ? i.title : i.from)}`, `DESCRIPTION:${icsEsc(desc)}`,
+    'BEGIN:VALARM', 'ACTION:DISPLAY', 'TRIGGER:-P1D', `DESCRIPTION:${icsEsc('明天：' + title)}`, 'END:VALARM',
+    'BEGIN:VALARM', 'ACTION:DISPLAY', 'TRIGGER:-PT3H', `DESCRIPTION:${icsEsc('3小时后：' + title)}`, 'END:VALARM',
+    'END:VEVENT',
+  ].join('\r\n');
+}
+function downloadIcs(name, events) {
+  const text = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//trip-share//CN', 'CALSCALE:GREGORIAN', ...events, 'END:VCALENDAR'].join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'text/calendar;charset=utf-8' }));
+  a.download = name + '.ics';
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  if (/MicroMessenger/i.test(navigator.userAgent)) toast('微信里加不了日历，请用手机浏览器打开');
+  else toast('打开后点「添加」，会提前1天和3小时提醒');
+}
+function addCal(id) { const i = Store.docs[id].data; downloadIcs(itemName(i), [itemEvent(i)]); }
+function addAllCal() {
+  const items = Store.items(route()).filter(i => i.type !== 'expense' && i.date);
+  if (!items.length) return toast('还没有可以加的行程');
+  downloadIcs(curTrip().name, items.map(itemEvent));
+}
+
+// ====== 分享 ======
+function share() {
+  if (!REMOTE) return toast('预览模式下朋友看不到，配置同步后再分享');
+  const trip = curTrip();
+  const text = `「${trip.name}」行程共享：${location.href}\n（在微信里点右上角「…」→「在浏览器打开」，再添加到主屏幕）`;
+  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+    .then(() => toast('链接已复制，发给朋友吧'))
+    .catch(() => prompt('复制下面的链接发给朋友', location.href));
+}
+
+// ====== 示例数据 ======
+function loadDemo() {
+  const s = addDays(todayStr(), 2), id = uid();
+  Store.put('trip', id, { id, name: '成都吃吃吃 🌶', start: s, end: addDays(s, 4), members: ['小王', '小李'], ignored: [] });
+  const add = d => Store.put('item', id, { id: uid(), title: '', code: '', from: '', to: '', time: '', endDate: '', endTime: '', bookedBy: '', paidBy: '', amount: '', splitAmong: [], note: '', ...d });
+  add({ type: 'flight', code: 'MU5401', from: '杭州萧山T3', to: '成都天府T1', date: s, time: '08:10', endDate: s, endTime: '11:05', bookedBy: '小王', paidBy: '小王', amount: '1180', note: '订单 2891234567' });
+  add({ type: 'hotel', title: '春熙路亚朵酒店', date: s, endDate: addDays(s, 2), bookedBy: '小李', paidBy: '小李', amount: '836' });
+  add({ type: 'expense', title: '晚饭 · 火锅', date: s, paidBy: '小李', amount: '386' });
+  add({ type: 'ticket', title: '大熊猫基地门票', date: addDays(s, 1), time: '08:30', bookedBy: '小王', paidBy: '小王', amount: '110' });
+  add({ type: 'expense', title: '小王的伴手礼', date: addDays(s, 2), paidBy: '小王', amount: '200', splitAmong: ['小王'] });
+  location.hash = '#/t/' + id;
+}
+
+// ====== 启动 ======
+async function refresh() {
+  const id = route();
+  const changed = id
+    ? await Store.pull('trip_id=eq.' + encodeURIComponent(id), d => d.trip_id === id)
+    : await Store.pull('kind=eq.trip', d => d.kind === 'trip');
+  if (changed || (id && !Store.docs[id])) render();
+}
+window.addEventListener('hashchange', () => { closeSheet(); render(); window.scrollTo(0, 0); refresh(); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { Store.flush(); refresh(); } });
+setInterval(() => { if (document.visibilityState === 'visible') { Store.flush(); refresh(); } }, 15000);
+setInterval(() => { if (document.visibilityState === 'visible' && $('#sheet').classList.contains('hidden')) render(); }, 60000);
+render();
+Store.flush();
+refresh();
+</script>
+</body>
+</html>
